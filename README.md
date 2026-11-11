@@ -46,6 +46,7 @@ Plánovaná stabilní verze je `v1.18.0.03`.
 3. Nastavte skutečný typ baterie a počet článků v sérii. Příklad pro 1S Li-ion:
 
    ```text
+   powersaving on
    cz.health battery liion
    cz.health battery.cells 1
    cz.health on
@@ -225,6 +226,7 @@ The planned stable version is `v1.18.0.03`.
 3. Set the actual battery chemistry and number of series cells. Example for 1S Li-ion:
 
    ```text
+   powersaving on
    cz.health battery liion
    cz.health battery.cells 1
    cz.health on
