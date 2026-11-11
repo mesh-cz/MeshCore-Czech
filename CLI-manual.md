@@ -127,6 +127,56 @@ u jednokanálového čidla používejte kanál 1.
 CzHealth podporuje napětí do **65,535 V**. Vyšší čtení se označí jako
 nepodporované/nedostupné, nikoli jako platná nulová hodnota.
 
+### Vlastíkova BMS: LTO a Na-ion
+
+Pro BMS od Vlastimila „Vlastíka“ ([uart.cz](https://uart.cz/)), která přes I2C
+emuluje INA260, zvolte podle skutečné
+baterie `lto-vlastik` nebo `naion-vlastik`. Například pro **LTO s jedním
+článkem v sérii**:
+
+```text
+cz.health battery lto-vlastik
+cz.health battery.cells 1
+cz.health current on
+```
+
+Počkejte přibližně minutu na nový vzorek a zkontrolujte `cz.health battery`
+a `cz.health check sensors`.
+
+Počet článků upravte podle skutečného zapojení. Změna typu či počtu článků
+vymaže dosavadní vzorky v RAM a první nový vzorek je plánovaný přibližně za
+minutu. Diagnostika ukazuje poslední měření; po změně kanálu nebo zapojení
+počkejte na další vzorek. Čidla se zjišťují při startu, proto po připojení
+zařízení, které při startu chybělo, repeater restartujte.
+
+Příklad výstupu `cz.health check sensors`:
+
+```text
+sensors on, n 1, age 29s, V bms, BMS ok, INA not detected, temp mcu, current ok, humidity unavailable
+```
+
+- `V bms` znamená, že poslední vzorek napětí pochází z BMS; `V ina` označuje
+  jiný INA zdroj a `V adc` analogový vstup desky.
+- `BMS ok` znamená, že se při posledním vzorku podařilo přečíst napětí a proud
+  přes rozhraní INA260. Pokud máte připojenou Vlastíkovu BMS, odpovídá
+  tento výstup jejímu běžnému chování. Firmware ale výrobce ani typ zařízení
+  spolehlivě nerozpozná; stejně může odpovědět i jiné kompatibilní zařízení.
+- `current ok` říká, že je pro poslední vzorek dostupný proud; `temp mcu`
+  označuje teplotu mikrokontroléru a `humidity unavailable` nedostupnou vlhkost.
+- **V režimech `lto-vlastik` a `naion-vlastik` položka `INA` v RC.10
+  neověřuje samostatně další připojené INA čidlo.** `INA not detected` proto
+  v těchto režimech samo o sobě nedokazuje, že další INA není připojená.
+  `BMS unavailable` znamená, že se čtení zvolené BMS nepodařilo; firmware
+  může pro napětí použít INA nebo ADC, proud BMS je pak nedostupný.
+
+`cz.health ina.channel 1`, `2` nebo `3` vybírá fyzický kanál INA3221 pro
+**napětí** a `cz.health ina.channel` zobrazí uloženou volbu. U samostatné
+jednokanálové INA219 použijte kanál 1. Tato volba nepřepíná kanál BMS ani
+nevybírá zdroj proudu. Je-li BMS dostupná a zvolená jako `lto-vlastik` nebo
+`naion-vlastik`, její napětí má přednost; kanál INA3221 se může uplatnit pro
+záložní měření napětí. Tento příkaz nevybírá konkrétní I2C zařízení; při
+více INA čidlech záleží na jejich detekci a pořadí ve firmwaru.
+
 ## 4. Teplota, proud a kontrola čidel
 
 | Příkaz | Význam |
@@ -374,6 +424,57 @@ single-channel devices should use channel 1.
 
 CzHealth supports up to **65.535 V**. Higher readings are marked unsupported
 and unavailable, rather than becoming a valid zero reading.
+
+#### Vlastik BMS: LTO and Na-ion
+
+For the BMS by Vlastimil “Vlastik” ([uart.cz](https://uart.cz/)), which emulates
+an INA260 over I2C, choose `lto-vlastik`
+or `naion-vlastik` according to the actual battery. Example for **one LTO
+cell in series**:
+
+```text
+cz.health battery lto-vlastik
+cz.health battery.cells 1
+cz.health current on
+```
+
+Wait about one minute for the new sample, then check `cz.health battery` and
+`cz.health check sensors`.
+
+Set the series-cell count to match the actual wiring. Changing chemistry or
+cell count clears RAM samples and schedules a fresh first sample after about
+one minute. Diagnostics show the last measurement; after changing a channel
+or wiring, wait for another sample. Sensors are discovered at boot, so restart
+the repeater after connecting a device that was absent at startup.
+
+Example `cz.health check sensors` output:
+
+```text
+sensors on, n 1, age 29s, V bms, BMS ok, INA not detected, temp mcu, current ok, humidity unavailable
+```
+
+- `V bms` means the last voltage sample came from the BMS; `V ina` indicates
+  another INA source and `V adc` the board's analog input.
+- `BMS ok` means voltage and current were read successfully through an
+  INA260 interface for the last sample. If you have connected Vlastik's BMS,
+  this is consistent with its expected operation. Firmware cannot
+  reliably identify the manufacturer or device type; another compatible device
+  can produce the same result.
+- `current ok` means current is available in the last sample; `temp mcu` is
+  the MCU temperature and `humidity unavailable` means no humidity reading.
+- **In `lto-vlastik` and `naion-vlastik` modes, RC.10 does not independently
+  check another INA sensor in the `INA` diagnostic field.** Therefore `INA not
+  detected` alone does not prove another INA is absent. `BMS unavailable`
+  means the selected BMS read failed; voltage may fall back to INA or ADC,
+  while BMS current remains unavailable.
+
+`cz.health ina.channel 1`, `2` or `3` selects the physical INA3221 channel
+for **voltage**; `cz.health ina.channel` shows the saved choice. Use channel 1
+for a single-channel INA219. This does not change the BMS channel or select
+the current source. When BMS is available and `lto-vlastik` or `naion-vlastik`
+is selected, its voltage takes priority; the INA3221 channel can be used for
+fallback voltage. This command does not select a particular I2C device; with
+multiple INA sensors, detection and firmware ordering affect selection.
 
 ### 4. Temperature, current and sensor validation
 
