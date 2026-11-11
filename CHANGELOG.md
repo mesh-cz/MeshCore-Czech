@@ -7,7 +7,7 @@ Přehled komunitních úprav vůči původnímu
 Soubory vydání: [Releases](https://github.com/mesh-cz/MeshCore-Czech/releases).
 Použití: [README](README.md) a [CLI manuál](CLI-manual.md).
 
-## RC.10 — `v1.18.0.02rc.10` — příprava vydání
+## RC.10 — `v1.18.0.02rc.10` — testovací vydání
 
 Komunitní vydání pro repeatery. Plánovaná stabilní verze je `v1.18.0.03`.
 
@@ -64,16 +64,15 @@ Komunitní vydání pro repeatery. Plánovaná stabilní verze je `v1.18.0.03`.
 
 ### Komunitní funkce a podpora desek
 
-- PowerSaving 18, místní CzGuard a jeho automatické reporty, CzWatchdog.
+- **PowerSaving 18** od [IoTThinks / EasySkyMesh](https://github.com/IoTThinks/EasySkyMesh/wiki/PowerSaving): úsporné funkce pro podporovaná zařízení.
+- Místní CzGuard a jeho automatické reporty, CzWatchdog.
 - Jednotné příkazy `cz.guard`, `cz.health` a `cz.watchdog…` bez starých aliasů.
 - CzHealth: nastavitelný typ baterie, články v sérii, skutečné zdroje
   napětí a podpora Vlastíkovy BMS přes emulaci INA260.
 - Rozšiřitelný CONFIG s domácím, výchozím a flood regiony; samostatné
   ovládání `cz.health config on|off`.
 - ProMicro podporuje BME280 a čidla INA včetně INA260.
-- YomaMesh obsahuje úpravy **RadekT (`cncnet-info`)** pro E22P:
-  AGC fallback 16 s při uložené nule, výchozí výkon čipu 5 dBm
-  a vypnutá startovní napěťová blokace.
+- YomaMesh obsahuje úpravy **RadekCX** ([cncnet-info](https://github.com/cncnet-info)) pro E22P: kalibraci rádia, AGC fallback 16 s při uložené nule, výchozí výkon čipu 5 dBm a vypnutou startovní napěťovou blokaci.
 - Volitelné skrytí baterie/teploty hostům přes `cz.telemetry.guest.hide`,
   výchozí OFF. Aktualizace zachovává uložené předvolby.
 
@@ -95,7 +94,7 @@ Community changes relative to upstream
 Downloads: [Releases](https://github.com/mesh-cz/MeshCore-Czech/releases).
 Usage: [README](README.md#english), [CLI manual](CLI-manual.md#english).
 
-### RC.10 — `v1.18.0.02rc.10` — release preparation
+### RC.10 — `v1.18.0.02rc.10` — test release
 
 Community repeater release. The planned stable version is `v1.18.0.03`.
 
@@ -151,16 +150,15 @@ Community repeater release. The planned stable version is `v1.18.0.03`.
 
 #### Community features and board support
 
-- PowerSaving 18, local CzGuard and automatic reports, CzWatchdog.
+- **PowerSaving 18** by [IoTThinks / EasySkyMesh](https://github.com/IoTThinks/EasySkyMesh/wiki/PowerSaving): power-saving features for supported devices.
+- Local CzGuard and automatic reports, CzWatchdog.
 - Canonical `cz.guard`, `cz.health`, `cz.watchdog…` commands without old aliases.
 - CzHealth: configurable battery chemistry, series cells, actual voltage
   provenance and Vlastik BMS support through INA260 emulation.
 - Extensible CONFIG with home/default/flood regions and independent
   `cz.health config on|off` control.
 - ProMicro supports BME280 and INA sensors including INA260.
-- YomaMesh integrates **RadekT (`cncnet-info`)** E22P changes:
-  16-second AGC fallback for saved zero, 5 dBm default chip power
-  and disabled boot-voltage lock.
+- YomaMesh includes E22P improvements by **RadekCX** ([cncnet-info](https://github.com/cncnet-info)): radio calibration, 16-second AGC fallback for saved zero, 5 dBm default chip power and disabled boot-voltage lock.
 - Optional guest battery/temperature hiding with `cz.telemetry.guest.hide`,
   default OFF. Updates retain saved preferences.
 
