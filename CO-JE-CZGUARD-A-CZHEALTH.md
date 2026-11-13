@@ -2,8 +2,10 @@
 
 **EN: [English version below](#english-version)**
 
-> 📣 **Chcete pomoct celé síti MeshCore v ČR?** Provozujete repeater?
-> Chcete mít nízkou spotřebu a vidět stav svého repeateru?
+> [!IMPORTANT]
+> ## 📣 Chcete pomoct celé síti MeshCore v ČR?
+> Provozujete repeater? Chcete mít nízkou spotřebu a vidět stav svého repeateru?
+>
 > **Tak tohle je určeno přímo vám…**
 
 > ℹ️ Popis platí pro firmware **MeshCore Czech RC.10**. V dalších verzích se
@@ -279,9 +281,12 @@ testování jsou vítané.
 
 ## 🛡️ What are CzHealth and CzGuard?
 
-> 📣 **Want to help the whole MeshCore network in the Czech Republic?** Do you
-> run a repeater? Want low power consumption and a view of your repeater's
-> status? **Then this is meant for you…**
+> [!IMPORTANT]
+> ## 📣 Want to help the whole MeshCore network in the Czech Republic?
+> Do you run a repeater? Want low power consumption and a view of your
+> repeater's status?
+>
+> **Then this is meant for you…**
 
 > ℹ️ This description applies to **MeshCore Czech RC.10** firmware. Behaviour
 > may change in later versions.
