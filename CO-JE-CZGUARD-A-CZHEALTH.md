@@ -4,9 +4,10 @@
 
 > [!IMPORTANT]
 > ## 📣 Chcete pomoct celé síti MeshCore v ČR?
-> Provozujete repeater? Chcete mít nízkou spotřebu a vidět stav svého repeateru?
+> Provozujete repeater? Chcete vidět jeho stav na dálku, mít nízkou spotřebu
+> (v zimě se hodí) a chránit síť před zahlcením?
 >
-> **Tak tohle je určeno přímo vám…**
+> **Tak tohle je určeno přímo vám…** 👇
 
 > ℹ️ Popis platí pro firmware **MeshCore Czech RC.10**. V dalších verzích se
 > chování může změnit.
@@ -28,6 +29,8 @@
   zahlcoval celou síť. Zatím žádná vydaná nebyla a o každé se bude hlasovat.
 - 👀 Všechny blokace, automatické i centrální, budou i s důvodem uvedené na
   veřejné stránce.
+- ⚙️ **Rozhoduje správce repeateru.** Hlášení jde vypnout a místní
+  automatiku přepnout do zkušebního režimu.
 
 ## 🤝 Děláme to pro všechny
 
@@ -283,10 +286,10 @@ testování jsou vítané.
 
 > [!IMPORTANT]
 > ## 📣 Want to help the whole MeshCore network in the Czech Republic?
-> Do you run a repeater? Want low power consumption and a view of your
-> repeater's status?
+> Do you run a repeater? Want to see its status remotely, keep power
+> consumption low (handy in winter) and protect the network from flooding?
 >
-> **Then this is meant for you…**
+> **Then this is meant for you…** 👇
 
 > ℹ️ This description applies to **MeshCore Czech RC.10** firmware. Behaviour
 > may change in later versions.
@@ -310,6 +313,8 @@ testování jsou vítané.
   be put to a vote.
 - 👀 All blocks, automatic and central, will be listed together with the
   reason on a public page.
+- ⚙️ **The repeater's operator decides.** Reporting can be turned off and
+  local automation switched to test mode.
 
 ### 🤝 We do this for everyone
 
