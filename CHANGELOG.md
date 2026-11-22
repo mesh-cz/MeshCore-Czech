@@ -7,6 +7,67 @@ Přehled komunitních úprav vůči původnímu
 Soubory vydání: [Releases](https://github.com/mesh-cz/MeshCore-Czech/releases).
 Použití: [README](README.md) a [CLI manuál](CLI-manual.md).
 
+## `v1.18.0.03` — stabilní vydání
+
+Stabilní komunitní vydání pro repeatery. Navazuje na RC.10; testovací
+verze RC.11 a RC.12 se veřejně nevydávaly a jejich obsah je součástí tohoto
+vydání.
+
+### CzHealth v5
+
+- DAY chodí každých **10–12 hodin** a nese vždy posledních 24 hodin, takže
+  jeden ztracený paket nevadí. Platí pro bateriové i externě napájené uzly;
+  týdenní SUMMARY se už neposílá.
+- Nová zpráva **STATS** jednou denně: šum, vysílací a přijímací čas, počty
+  paketů, zahozené pakety CzGuardem, duplicity, chybná přihlášení
+  a odmítnutá přehrání.
+- Vzorky se při důvěryhodném čase (admin nebo GPS) zarovnají na :00/:30.
+- Alarm (dřívější hlášení) i při **ztrátě externího napájení**.
+- `cz.health check` ukazuje verzi `v5` a výsledek posledního odeslání.
+
+### CzGuard
+
+- **Centrální blokace zrušena:** testovací verze RC obsahovaly funkci
+  Central Ban. Na základě přání komunity byla kompletně odebrána: centrální
+  bany a výjimky ani příkazy `cz.guard central`, `inject`, `key` a `send` už
+  nejsou. Uložené soubory
+  centrály repeater při startu smaže. Rozhodují jen místní automatická pravidla.
+- **Méně reportů:** report jen při novém banu nebo konci banu (nejvýš jednou
+  za 6 hodin) a jednou denně. Omezení, zkušební den ani vyšší stupeň banu
+  report nevyvolají.
+- **Ochrana proti hádání hesel:** po 10 špatných heslech z jednoho klíče
+  za 15 minut (30 ze všech klíčů dohromady) se přihlášení dočasně zablokuje;
+  opakovaná blokace se prodlužuje až na 12 hodin. Administrátoři v ACL se
+  neblokují. Nová blokace se nahlásí v reportu CzGuard během několika minut.
+  Nastavení přes `cz.guard login`, viz [CLI manuál](CLI-manual.md).
+- **Flood přihlášení:** víc než 30 žádostí o přihlášení k jednomu repeateru
+  za 60 minut se 12 hodin nepřeposílá; limity jdou změnit
+  (`cz.guard login flood`).
+- **Varování na výchozí heslo** administrátora v `cz.guard`, `cz.guard login`
+  a při startu.
+
+### Správa repeateru
+
+- **Ochrana proti přehrání** nahraných příkazů administrátora platí i po
+  restartu repeateru. Po posunutí času v companionu dozadu se přihlaste
+  z jiného companionu, viz [CLI manuál](CLI-manual.md).
+- **`region load`:** po 60 s bez řádku se zruší a regiony zůstanou beze změny;
+  každý řádek repeater potvrdí; řádek bez odsazení načítání zruší, takže už
+  nespolkne další příkazy.
+
+### Opravy z oficiálního MeshCore
+
+- Pád při dlouhé odpovědi CLI.
+- Pakety bez CRC.
+- Zámek CC310 na nRF52.
+- Scope 0.
+- Záporný TX výkon.
+- Zesílení po resetu AGC.
+
+### Stav ověření
+
+- Správce ověřil vydání na svých repeaterech.
+
 ## RC.10 — `v1.18.0.02rc.10` — testovací vydání
 
 Komunitní vydání pro repeatery. Plánovaná stabilní verze je `v1.18.0.03`.
@@ -93,6 +154,67 @@ Community changes relative to upstream
 [MeshCore](https://github.com/meshcore-dev/MeshCore).
 Downloads: [Releases](https://github.com/mesh-cz/MeshCore-Czech/releases).
 Usage: [README](README.md#english), [CLI manual](CLI-manual.md#english).
+
+### `v1.18.0.03` — stable release
+
+Stable community repeater release. It follows RC.10; the RC.11 and RC.12
+test versions were not released publicly and their content is part of this
+release.
+
+#### CzHealth v5
+
+- DAY is sent every **10–12 hours** and always carries the last 24 hours, so
+  one lost packet does not matter. This applies to battery and externally
+  powered nodes alike; the weekly SUMMARY is no longer sent.
+- New **STATS** message once a day: noise floor, TX and RX airtime, packet
+  counts, packets dropped by CzGuard, duplicates, wrong-password logins and
+  refused replays.
+- With a trusted clock (admin or GPS) samples are aligned to :00/:30.
+- Alarm (early report) also on **loss of external power**.
+- `cz.health check` shows `v5` and the result of the last send.
+
+#### CzGuard
+
+- **Central blocking removed:** the RC test versions had a Central Ban
+  feature. Following the wishes of the community it has been removed
+  completely: central bans and exceptions and the commands
+  `cz.guard central`, `inject`, `key` and `send` are gone. The repeater
+  deletes the stored central files at boot. Only the local automatic rules decide.
+- **Fewer reports:** a report only when a ban starts or ends (at most every
+  6 hours) and once a day. A limit, a test day or a higher ban stage does not
+  trigger a report.
+- **Protection against password guessing:** after 10 wrong passwords from one
+  key within 15 minutes (30 from all keys together) logins are locked for a
+  while; a repeated lock grows up to 12 hours. Admins in the ACL are never
+  locked. A new lock is reported in a CzGuard report within a few minutes.
+  Settings via `cz.guard login`, see the [CLI manual](CLI-manual.md#english).
+- **Flood logins:** more than 30 login requests to one repeater within
+  60 minutes are not forwarded for 12 hours; the limits can be changed
+  (`cz.guard login flood`).
+- **Default password warning** for the admin password in `cz.guard`,
+  `cz.guard login` and at boot.
+
+#### Repeater administration
+
+- **Replay protection** of recorded administrator commands also holds across
+  restarts. If the companion clock was set back, log in from another
+  companion; see the [CLI manual](CLI-manual.md#english).
+- **`region load`:** cancelled after 60 s without a line, leaving the regions
+  unchanged; the repeater acknowledges every line; a line without indent
+  cancels the load, so it no longer swallows later commands.
+
+#### Fixes from upstream MeshCore
+
+- Crash on a long CLI reply.
+- Packets without CRC.
+- CC310 lock on nRF52.
+- Scope 0.
+- Negative TX power.
+- Gain after an AGC reset.
+
+#### Validation status
+
+- The maintainer verified the release on their own repeaters.
 
 ### RC.10 — `v1.18.0.02rc.10` — test release
 

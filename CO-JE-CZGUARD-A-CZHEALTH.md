@@ -9,8 +9,8 @@
 >
 > **Tak tohle je určeno přímo vám…** 👇
 
-> ℹ️ Popis platí pro firmware **MeshCore Czech RC.10**. V dalších verzích se
-> chování může změnit.
+> ℹ️ Popis platí pro firmware **MeshCore Czech v1.18.0.03**. V dalších verzích
+> se chování může změnit.
 
 ## ⚡ V kostce
 
@@ -25,10 +25,14 @@
 - 🔋 **Šetří baterii.** Firmware má úsporný režim, a když CzGuard zastaví
   škodlivý flood, nemusí ho vysílat ani tvůj repeater, ani ostatní repeatery
   v síti. V zimě se to hodí.
-- 🚨 **Centrální blokace** je poslední pojistka pro případ, že by útočník
-  zahlcoval celou síť. Zatím žádná vydaná nebyla a o každé se bude hlasovat.
-- 👀 Všechny blokace, automatické i centrální, budou i s důvodem uvedené na
-  veřejné stránce.
+- 🚨 **Žádná centrální blokace.** Od verze v1.18.0.03 rozhoduje vždy jen
+  samotný repeater podle místních pravidel. Nikdo nemůže na dálku zablokovat
+  provoz na cizích repeaterech.
+- 👀 Stav CzGuard a přehled blokací najdeš na
+  [tools.meshcore.cz](https://tools.meshcore.cz/) v záložce **CzGuard**
+  (zkušební verze). Stav repeaterů z CzHealth je v
+  [CoreScope](https://analyzer.meshcore.website/) a na
+  [mapě](https://mapa.meshcore.cz/).
 - ⚙️ **Rozhoduje správce repeateru.** Hlášení jde vypnout a místní
   automatiku přepnout do zkušebního režimu.
 
@@ -110,7 +114,8 @@ Podle desky a připojených čidel:
 | 🌡️ | **Teplota** | Z externího čidla nebo z mikrokontroléru. |
 | ⚡ | **Proud a vlhkost** | Jen s podporovaným čidlem. Chybějící údaj neznamená nulu. |
 | ⏱️ | **Doba provozu a důvod restartu** | Poznáš, že se repeater restartoval, a pokud to deska umí, i proč. |
-| 🗺️ | **Regiony, verze firmwaru, deska** | Posílá se v samostatném konfiguračním hlášení. |
+| 📶 | **Statistika provozu** | Jednou denně: šum, vysílací čas, počty paketů. Ukáže, jak je repeater vytížený. |
+| 🗺️ | **Regiony, verze firmwaru, deska** | Regiony a deska jdou v samostatném konfiguračním hlášení. |
 
 Hlášení obsahují jen tyto technické údaje, žádný obsah zpráv.
 
@@ -120,10 +125,11 @@ Repeater hodnoty průběžně měří a posílá je souhrnně, aby zbytečně ne
 síť. Data tedy nechodí v reálném čase:
 
 - první hlášení po startu přijde zhruba za **30 až 90 minut**,
-- bateriové uzly posílají přehled **aspoň jednou denně**, i když se nic
-  nemění,
+- potom repeater posílá přehled **každých 10 až 12 hodin**; každý nese
+  posledních 24 hodin, takže jedno ztracené hlášení nevadí,
+- při ztrátě externího napájení pošle hlášení dřív (alarm),
 - správce si může hlášení vyžádat ručně, nejvýš **jednou za 4 hodiny**,
-- konfigurační hlášení s regiony má vlastní plán.
+- statistika provozu a konfigurační hlášení s regiony mají vlastní plán.
 
 > ⚠️ Odeslané hlášení nemusí dorazit, třeba při slabém pokrytí nebo když ho
 > nezachytí žádný přijímač připojený ke službě. **Chybějící údaj tedy
@@ -131,9 +137,13 @@ síť. Data tedy nechodí v reálném čase:
 
 ### 👁️ Kdo to vidí?
 
-**Údaje jsou veřejné.** Zobrazují se v komunitních službách, například v
-[CoreScope](https://analyzer.meshcore.website/) v detailu repeateru, panel
-**MeshCore-Czech**. Senzorová i konfigurační hlášení jde vypnout každé zvlášť,
+**Údaje jsou veřejné.** Stav repeaterů z CzHealth najdeš:
+
+- v [CoreScope](https://analyzer.meshcore.website/) v detailu repeateru,
+  panel **MeshCore-Czech**,
+- na komunitní [mapě](https://mapa.meshcore.cz/).
+
+Senzorová i konfigurační hlášení jde vypnout každé zvlášť,
 postup je v [CLI manuálu](https://github.com/mesh-cz/MeshCore-Czech/blob/main/CLI-manual.md).
 
 Když má repeater vypnuté přeposílání (`Repeat OFF`), CzHealth ve výchozím
@@ -156,12 +166,15 @@ přeposlat dál. Když nějaký proud floodí **nepřetržitě**, repeater ho p�
   adverty a určité dotazy a pokusy o přihlášení,
 - u proudu, který neustále zatěžuje síť, nejdřív omezí jeho dosah, a když
   to pokračuje, dočasně ho přestane přeposílat,
-- po čase situaci znovu vyhodnotí; když flood přestane, omezení skončí.
+- po čase situaci znovu vyhodnotí; když flood přestane, omezení skončí,
+- chrání správu repeateru před hádáním hesel: po opakovaných špatných heslech
+  dočasně nepřijme přihlášení z daného klíče.
 
 **❌ Nedělá:**
 
 - **neblokuje uživatele ani zařízení**, omezuje jen konkrétní proud flood
-  provozu,
+  provozu (jedinou výjimkou je dočasné odmítnutí přihlášení po opakovaném
+  špatném hesle),
 - nesahá na přímo směrované zprávy ani na prioritní kontakty,
 - nečte obsah zpráv a neposuzuje, o čem se píše, sleduje jen četnost,
 - nedokáže zabránit tomu, aby rádiové vysílání fyzicky doletělo k okolním
@@ -176,32 +189,26 @@ přeposlat dál. Když nějaký proud floodí **nepřetržitě**, repeater ho p�
 Omezení neznamená, že někdo útočí. Většinou jde o chybu, o které majitel
 zařízení ani neví.
 
-### 🚨 Místní a centrální blokace
+### 🚨 Jen místní blokace
 
-**Místní (automatická) blokace:** každý repeater rozhoduje sám podle toho,
-co zachytí. Dva repeatery proto můžou vyhodnotit stejnou situaci v různou
-chvíli. Správce repeateru může místní automatiku vypnout nebo přepnout do
-zkušebního režimu.
+**Každý repeater rozhoduje sám** podle toho, co zachytí. Dva repeatery proto
+můžou vyhodnotit stejnou situaci v různou chvíli. Správce repeateru může
+místní automatiku vypnout nebo přepnout do zkušebního režimu.
 
-**Centrální blokace** je **poslední pojistka** pro případ, že by útočník
-cíleně zahlcoval celou síť a místní ochrana nestačila. Je to nástroj pro
-krizovou situaci, ne pro běžnou správu:
+**Centrální blokace ve verzi v1.18.0.03 není.** Testovací verze RC (RC.10)
+obsahovaly funkci Central Ban jako krizovou pojistku, ale žádný centrální ban
+nikdy vydán nebyl. Na základě přání komunity byla funkce kompletně odebrána:
+nikdo nemůže na dálku zablokovat provoz na cizím
+repeateru a repeater případné staré centrální záznamy při startu smaže.
 
-- **zatím žádná centrální blokace vydaná nebyla**,
-- o vydání se **hlasuje v komunitě na Telegramu**, nikdo o ní nerozhoduje
-  sám; v novějších verzích může přibýt i jiný způsob hlasování,
-- každá blokace má omezenou platnost, nebo ji jde centrálně zrušit,
-- v RC.10 ji správce repeateru nemůže lokálně přebít, jinak by v
-  krizové situaci neplnila svůj účel. **Od verze RC.11 bude mít správce
-  repeateru možnost centrální blokace na svém repeateru vypnout.**
-- **Od verze RC.11:** vypnutím CzGuard, nebo jen jeho funkce Central Ban,
-  repeater nebude odesílat ani CzHealth.
+Repeater o své ochraně posílá krátký report: po startu, při novém banu nebo
+jeho konci a jednou denně. Z reportů vznikne přehled blokací v síti.
 
 ### 🔎 Kde uvidím, co je blokované?
 
-Připravujeme **veřejnou stránku**, kde budou uvedené automatické blokace
-na repeaterech i centrální blokace, vždy s důvodem. Odkaz doplníme po
-spuštění.
+Stav CzGuard a přehled blokací v síti je na stránce
+[tools.meshcore.cz](https://tools.meshcore.cz/) v záložce **CzGuard**.
+Stránka je ve **zkušební verzi** a budeme ji postupně vylepšovat.
 
 Správce repeateru vidí stav ochrany a statistiky v administraci
 repeateru, příkazy jsou v
@@ -244,9 +251,9 @@ zlomek toho, co dokáže spotřebovat nepřetržitý flood.
 Při normálním používání ne. CzGuard reaguje jen na nepřetržitý flood provoz
 24/7 a i pak omezí jen ten jeden proud, ne tebe.
 
-**Kdo rozhoduje o centrální blokaci?**  
-Komunita hlasováním na Telegramu. Zatím žádná vydaná nebyla a je určená
-jen pro případ útoku na celou síť.
+**Může někdo zablokovat provoz centrálně?**  
+Ne. Od verze v1.18.0.03 centrální blokace neexistuje, o každé blokaci
+rozhoduje jen repeater sám podle místních pravidel.
 
 **Znamená blokace, že někdo útočí?**  
 Ne. Častěji jde o chybu nebo špatně nastavenou automatizaci.
@@ -255,7 +262,8 @@ Ne. Častěji jde o chybu nebo špatně nastavenou automatizaci.
 Ne. Řeší jen nepřetržitý flood. Běžný spam ani fyzické rušení neodstraní.
 
 **Jsou údaje z CzHealth veřejné?**  
-Ano. Správce může hlášení vypnout, viz výše.
+Ano, zobrazují se v [CoreScope](https://analyzer.meshcore.website/) a na
+[mapě](https://mapa.meshcore.cz/). Správce může hlášení vypnout, viz výše.
 
 **Proč v přehledu nic není?**  
 Hlášení ještě nebylo odesláno, nedorazilo, deska údaj nemá, nebo ho služba
@@ -270,7 +278,8 @@ a zapojení pořád potřebují kontrolu.
 - [MeshCore Czech: README a rychlý start](https://github.com/mesh-cz/MeshCore-Czech)
 - [Vydání firmwaru](https://github.com/mesh-cz/MeshCore-Czech/releases)
 - [CLI manuál pro správce](https://github.com/mesh-cz/MeshCore-Czech/blob/main/CLI-manual.md)
-- [CoreScope](https://analyzer.meshcore.website/)
+- [CoreScope](https://analyzer.meshcore.website/) a [mapa](https://mapa.meshcore.cz/): stav repeaterů z CzHealth
+- [tools.meshcore.cz](https://tools.meshcore.cz/), záložka **CzGuard**: stav CzGuard (zkušební verze)
 
 Obě funkce vznikají s pomocí komunity. Zpětná vazba, hlášení chyb a výsledky
 testování jsou vítané.
@@ -291,8 +300,8 @@ testování jsou vítané.
 >
 > **Then this is meant for you…** 👇
 
-> ℹ️ This description applies to **MeshCore Czech RC.10** firmware. Behaviour
-> may change in later versions.
+> ℹ️ This description applies to **MeshCore Czech v1.18.0.03** firmware.
+> Behaviour may change in later versions.
 
 ### ⚡ In a nutshell
 
@@ -308,11 +317,14 @@ testování jsou vítané.
 - 🔋 **It saves battery.** The firmware has a power-saving mode, and when
   CzGuard stops harmful flooding, neither your repeater nor the other
   repeaters in the network have to transmit it. Handy in winter.
-- 🚨 **Central blocking** is the last line of defence in case an attacker
-  floods the whole network. None has been issued so far, and every one will
-  be put to a vote.
-- 👀 All blocks, automatic and central, will be listed together with the
-  reason on a public page.
+- 🚨 **No central blocking.** From v1.18.0.03 on, only the repeater itself
+  decides, by local rules. Nobody can remotely block traffic on other
+  people's repeaters.
+- 👀 CzGuard status and an overview of blocks are on
+  [tools.meshcore.cz](https://tools.meshcore.cz/) in the **CzGuard** tab
+  (trial version). Repeater status from CzHealth is in
+  [CoreScope](https://analyzer.meshcore.website/) and on the
+  [map](https://mapa.meshcore.cz/).
 - ⚙️ **The repeater's operator decides.** Reporting can be turned off and
   local automation switched to test mode.
 
@@ -398,7 +410,8 @@ Depending on the board and connected sensors:
 | 🌡️ | **Temperature** | From an external sensor or from the microcontroller. |
 | ⚡ | **Current and humidity** | Only with a supported sensor. A missing value does not mean zero. |
 | ⏱️ | **Uptime and reset reason** | Shows that the repeater restarted and, if the board supports it, why. |
-| 🗺️ | **Regions, firmware version, board** | Sent in a separate configuration report. |
+| 📶 | **Traffic statistics** | Once a day: noise floor, airtime, packet counts. Shows how busy the repeater is. |
+| 🗺️ | **Regions, firmware version, board** | Regions and board go in a separate configuration report. |
 
 Reports contain only this technical data, no message content.
 
@@ -408,11 +421,13 @@ The repeater measures values continuously and sends them in batches so it
 doesn't load the network unnecessarily. The data is not real-time:
 
 - the first report after start-up arrives in roughly **30 to 90 minutes**,
-- battery-powered nodes send an overview **at least once a day**, even if
-  nothing changes,
+- after that the repeater sends an overview **every 10 to 12 hours**; each
+  one carries the last 24 hours, so one lost report doesn't matter,
+- on loss of external power it sends a report early (alarm),
 - the operator can request a report manually, at most **once every 4
   hours**,
-- the configuration report with regions has its own schedule.
+- traffic statistics and the configuration report with regions have their
+  own schedule.
 
 > ⚠️ A sent report may not arrive, for example with weak coverage or if no
 > receiver connected to the service picks it up. **A missing value
@@ -420,9 +435,13 @@ doesn't load the network unnecessarily. The data is not real-time:
 
 #### 👁️ Who can see it?
 
-**The data is public.** It is shown in community services, for example in
-[CoreScope](https://analyzer.meshcore.website/) in the repeater detail,
-**MeshCore-Czech** panel. Sensor and configuration reports can each be
+**The data is public.** You can find repeater status from CzHealth:
+
+- in [CoreScope](https://analyzer.meshcore.website/) in the repeater detail,
+  **MeshCore-Czech** panel,
+- on the community [map](https://mapa.meshcore.cz/).
+
+Sensor and configuration reports can each be
 turned off separately; see the
 [CLI manual](https://github.com/mesh-cz/MeshCore-Czech/blob/main/CLI-manual.md).
 
@@ -447,12 +466,15 @@ stops spreading it into the network. All other traffic passes unchanged.
 - for a stream that keeps loading the network, first limit its reach and,
   if it continues, temporarily stop forwarding it,
 - re-evaluate the situation after a while; when the flooding stops, the
-  limit ends.
+  limit ends,
+- protect the repeater administration against password guessing: after
+  repeated wrong passwords it temporarily refuses logins from that key.
 
 **❌ It doesn't:**
 
 - **block users or devices**; it only limits a specific stream of flood
-  traffic,
+  traffic (the only exception is a temporary login refusal after repeated
+  wrong passwords),
 - touch directly routed messages or priority contacts,
 - read message content or judge what is being written; it only looks at
   frequency,
@@ -469,33 +491,27 @@ stops spreading it into the network. All other traffic passes unchanged.
 A limit doesn't mean someone is attacking. Most of the time it's a mistake
 the device owner isn't even aware of.
 
-#### 🚨 Local and central blocking
+#### 🚨 Local blocking only
 
-**Local (automatic) blocking:** each repeater decides on its own based on
-what it hears. Two repeaters may therefore evaluate the same situation at
-different times. The repeater's operator can turn local automation off or
-switch it to test mode.
+**Each repeater decides on its own** based on what it hears. Two repeaters
+may therefore evaluate the same situation at different times. The
+repeater's operator can turn local automation off or switch it to test mode.
 
-**Central blocking** is **the last line of defence** in case an attacker
-deliberately floods the whole network and local protection isn't enough. It
-is a tool for a crisis, not for everyday administration:
+**v1.18.0.03 has no central blocking.** The RC test versions (RC.10) had a
+Central Ban feature as an emergency safeguard, but no central ban was ever
+issued. Following the wishes of the community the feature has been removed
+completely: nobody can remotely block traffic on someone else's repeater, and
+the repeater deletes any old central records at start-up.
 
-- **no central block has been issued so far**,
-- issuing one is **put to a community vote on Telegram**; nobody decides
-  on their own. Newer versions may add another way of voting,
-- every block has a limited validity, or it can be lifted centrally,
-- in RC.10 the repeater's operator cannot override it locally, otherwise
-  it wouldn't serve its purpose in a crisis. **From RC.11 on, repeater
-  operators will be able to turn central blocking off on their own
-  repeater.**
-- **From RC.11 on:** if CzGuard, or just its Central Ban feature, is turned
-  off, the repeater will not send CzHealth either.
+The repeater sends a short report about its protection: after start-up, when
+a ban starts or ends, and once a day. These reports make up the overview of
+blocks in the network.
 
 #### 🔎 Where can I see what is blocked?
 
-We are preparing a **public page** listing automatic blocks on repeaters
-as well as central blocks, always with the reason. We'll add the link once
-it's live.
+CzGuard status and an overview of blocks in the network are on
+[tools.meshcore.cz](https://tools.meshcore.cz/) in the **CzGuard** tab. The
+page is a **trial version** and we will keep improving it.
 
 The repeater's operator can see protection status and statistics in the
 repeater's administration; commands are in the
@@ -541,9 +557,9 @@ that's a fraction of what continuous flooding can consume.
 Not with normal use. CzGuard only reacts to continuous 24/7 flood traffic,
 and even then it limits just that one stream, not you.
 
-**Who decides on central blocking?**  
-The community, by a vote on Telegram. None has been issued so far, and it's
-meant only for an attack on the whole network.
+**Can anyone block traffic centrally?**  
+No. From v1.18.0.03 on there is no central blocking; only the repeater
+itself decides on each block, by local rules.
 
 **Does a block mean someone is attacking?**  
 No. More often it's a mistake or a badly configured automation.
@@ -553,7 +569,9 @@ No. It only deals with continuous flooding. It won't remove ordinary spam
 or physical radio interference.
 
 **Is CzHealth data public?**  
-Yes. The operator can turn reports off; see above.
+Yes, it is shown in [CoreScope](https://analyzer.meshcore.website/) and on
+the [map](https://mapa.meshcore.cz/). The operator can turn reports off;
+see above.
 
 **Why is the overview empty?**  
 The report hasn't been sent yet, didn't arrive, the board doesn't have that
@@ -569,7 +587,8 @@ antenna and wiring still need checking.
 - [MeshCore Czech: README and quick start](https://github.com/mesh-cz/MeshCore-Czech)
 - [Firmware releases](https://github.com/mesh-cz/MeshCore-Czech/releases)
 - [CLI manual for operators](https://github.com/mesh-cz/MeshCore-Czech/blob/main/CLI-manual.md)
-- [CoreScope](https://analyzer.meshcore.website/)
+- [CoreScope](https://analyzer.meshcore.website/) and the [map](https://mapa.meshcore.cz/): repeater status from CzHealth
+- [tools.meshcore.cz](https://tools.meshcore.cz/), **CzGuard** tab: CzGuard status (trial version)
 
 Both features are developed with the community's help. Feedback, bug
 reports and test results are welcome.
